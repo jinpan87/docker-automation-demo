@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.1.5.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <groupId>com.docker.automation</groupId>
+    <artifactId>docker-automation-demo</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>docker-automation-demo</name>
+    <description>docker自动化部署依赖</description>
+
+    <properties>
+        <java.version>1.8</java.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>docker-automation-demo</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>com.github.lazyBoyl</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>1.0-release</version>
+                <configuration>
+                    <!-- 需要上传到服务器的jar包所在的位置 -->
+                    <jarTargetPath>${basedir}/target/docker-automation-demo.jar</jarTargetPath>
+                    <!-- 创建镜像的dockerFile的本地配置文件的路径 -->
+                    <dockerFilePath>${basedir}/dockerFile/Dockerfile</dockerFilePath>
+                    <!-- 我们的dockerFile文件和相应的jar包的文件上传到服务器的路径 -->
+                    <dockerImagesPath>/home/app/docker/test/</dockerImagesPath>
+                    <!-- 该工程启动的时候的日志文件的挂载，前面的为本地的服务器的路径，分号后面的为docker容器中的文件路径 -->
+                    <containerRunShare>/home/app/logs/docker-automation-demo/log/:/app/www/logs/docker-automation-demo/log/</containerRunShare>
+                    <!-- 该工程启动的时候的端口映射,多个端口那就对应着启动多少个容器 -->
+                    <containerRunPorts>
+                        <containerRunPort>8088:8088</containerRunPort>
+                    </containerRunPorts>
+                    <options>
+                        <!-- 服务器的ip:端口,账号,密码 -->
+                        <option>
+                            10.10.10.114:22,root,123456
+                        </option>
+                    </options>
+                </configuration>
+                <executions>
+                    <execution>
+                        <!-- 设置该插件的执行的生命周期为package完成以后执行,若不想绑定就将executions这块的代码注释了，后面就不会在打包好以后再去执行docker插件的操作 -->
+                        <phase>package</phase>
+                        <goals>
+                            <!--phase与goal是绑定的关系，当g到达了phase阶段的时候就会去执行goal，此处的值固定为dockerMavenPlugin，因为插件给予他的名字就是dockerMavenPlugin -->
+                            <goal>dockerMavenPlugin</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

@@ -1,0 +1,6 @@
+FROM base-jdk
+   MAINTAINER linzf <282245889@qq.com>
+   RUN mkdir -p /app/www/logs/docker-automation-demo/log/
+   RUN mkdir -p /home/app/
+   ADD docker-automation-demo.jar /home/app/app.jar
+   CMD java -jar -Xms128m -Xmx1536m /home/app/app.jar
